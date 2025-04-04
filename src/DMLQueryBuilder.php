@@ -21,21 +21,23 @@ use function count;
  */
 final class DMLQueryBuilder extends AbstractDMLQueryBuilder
 {
-    public function insertBatch(string $table, iterable $rows, array $columns = [], array &$params = []): string
+    public function insertBatch(string $table, iterable $rows, array $columns = [], int $rowsAtOnceLimit = 0): array
     {
         if (!is_array($rows)) {
             $rows = $this->prepareTraversable($rows);
         }
 
         if (empty($rows)) {
-            return '';
+            return [];
         }
 
-        $columns = $this->extractColumnNames($rows, $columns);
-        $values = $this->prepareBatchInsertValues($table, $rows, $columns, $params);
+        $statements = [];
 
-        if (empty($values)) {
-            return '';
+        $columns = $this->extractColumnNames($rows, $columns);
+        $parameters = $this->prepareBatchInsertValues($table, $rows, $columns, $rowsAtOnceLimit);
+
+        if (empty($parameters)) {
+            return [];
         }
 
         $query = 'INSERT INTO ' . $this->quoter->quoteTableName($table);
@@ -46,7 +48,14 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
             $query .= ' (' . implode(', ', $quotedColumnNames) . ')';
         }
 
-        return $query . "\nSELECT " . implode(" FROM DUAL UNION ALL\nSELECT ", $values) . ' FROM DUAL';
+        foreach ($parameters as $parameter) {
+            $statements[] = new QueryStatement(
+                $query . "\nSELECT " . implode(" FROM DUAL UNION ALL\nSELECT ", $parameter->values) . ' FROM DUAL',
+                $parameter->params
+            );
+        }
+
+        return $statements;
     }
 
     public function insertWithReturningPks(string $table, QueryInterface|array $columns, array &$params = []): string
