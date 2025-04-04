@@ -9,6 +9,7 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\AbstractDMLQueryBuilder;
+use Yiisoft\Db\Command\QueryStatement;
 
 use function array_fill;
 use function array_key_first;
