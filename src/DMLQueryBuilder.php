@@ -49,6 +49,7 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
             $query .= ' (' . implode(', ', $quotedColumnNames) . ')';
         }
 
+        /** @var array $parameter */
         foreach ($parameters as $parameter) {
             $statements[] = new QueryStatement(
                 $query . "\nSELECT " . implode(" FROM DUAL UNION ALL\nSELECT ", $parameter['values']) . ' FROM DUAL',
