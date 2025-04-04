@@ -50,8 +50,8 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
 
         foreach ($parameters as $parameter) {
             $statements[] = new QueryStatement(
-                $query . "\nSELECT " . implode(" FROM DUAL UNION ALL\nSELECT ", $parameter->values) . ' FROM DUAL',
-                $parameter->params
+                $query . "\nSELECT " . implode(" FROM DUAL UNION ALL\nSELECT ", $parameter['values']) . ' FROM DUAL',
+                $parameter['params']
             );
         }
 
